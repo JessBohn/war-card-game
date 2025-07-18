@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
+require 'pry'
 require_relative 'deck'
 require_relative 'player'
 # Game class represents the card game
 class Game
-  attr_reader :players, :deck, :winner
+  # Maximum number of rounds to prevent infinite loops
+  MAX_ROUNDS = 3000
+
+  attr_reader :players, :deck, :round, :winner
 
   # Initializes the game with a number of players
   # Leaving the variable num as an argument allows for flexibility in testing and future development
@@ -12,23 +16,23 @@ class Game
   def initialize(num = nil)
     @players = choose_players(num)
     @deck = Deck.new
+    @round = 1
     @winner = nil
   end
 
   def play
-    puts 'This means War! (the game)...'
     puts "Number of players: #{players.size}"
-
     puts 'Dealing cards...'
     deal_cards
 
-    puts 'Starting the battle...'
-    until game_over?
+    puts 'Starting the war...'
+    until game_over? || round > MAX_ROUNDS
       active_players = players.reject(&:out_of_cards?)
       play_round(active_players)
+      @round += 1
     end
     set_winner
-    puts "\nWar is over! The winner is: #{winner.name}"
+    puts "\nWar is over in #{round - 1} battles! The winner is: #{winner.name}"
   end
 
   def deal_cards
@@ -55,18 +59,14 @@ class Game
     max_card = plays.values.compact.max
     winners = plays.select { |_, card| card == max_card }.keys
     winnings.concat(plays.values)
+
     if winners.size > 1
-      war_cards = []
-
-      winners.each do |winner|
-        3.times { war_cards << winner.draw_card } # Face-down cards
-        war_cards << winner.draw_card             # Face-up war card
-      end
-
-      winnings.concat(war_cards.compact)
+      # If a player tied on their last card, they're automatically out of the game
       winners.reject!(&:out_of_cards?)
-
       return if winners.empty?
+
+      war_cards = tie_handler(winners)
+      winnings.concat(war_cards.compact)
 
       play_round(winners, winnings)
     else
@@ -80,5 +80,21 @@ class Game
 
   def set_winner
     @winner = @players.max_by { |player| player.hand.size }
+  end
+
+  def tie_handler(winners)
+    war_cards = []
+    winners.each do |winner|
+      subset = 3.times.map { winner.draw_card } # Face-down cards
+      # Remove nils in case a player runs out of cards
+      if subset.any?(nil)
+        subset.compact!
+        # Takes the last playable card and puts it back on top of the winner's hand
+        last_playable = subset.pop
+        winner.hand.unshift(last_playable) if last_playable
+      end
+      war_cards.concat(subset)
+    end
+    war_cards
   end
 end
