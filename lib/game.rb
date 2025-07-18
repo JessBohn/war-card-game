@@ -4,7 +4,7 @@ require_relative 'deck'
 require_relative 'player'
 # Game class represents the card game
 class Game
-  attr_reader :players, :deck
+  attr_reader :players, :deck, :winner
 
   # Initializes the game with a number of players
   # Leaving the variable num as an argument allows for flexibility in testing and future development
@@ -12,6 +12,7 @@ class Game
   def initialize(num = nil)
     @players = choose_players(num)
     @deck = Deck.new
+    @winner = nil
   end
 
   def play
@@ -21,7 +22,13 @@ class Game
     puts 'Dealing cards...'
     deal_cards
 
-    play_round(players) until game_over?
+    puts 'Starting the battle...'
+    until game_over?
+      active_players = players.reject(&:out_of_cards?)
+      play_round(active_players)
+    end
+    set_winner
+    puts "\nWar is over! The winner is: #{winner.name}"
   end
 
   def deal_cards
@@ -69,5 +76,9 @@ class Game
 
   def game_over?
     players.count { |player| !player.out_of_cards? } <= 1
+  end
+
+  def set_winner
+    @winner = @players.max_by { |player| player.hand.size }
   end
 end
