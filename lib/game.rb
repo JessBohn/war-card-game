@@ -6,6 +6,7 @@ require_relative 'player'
 class Game
   # Maximum number of rounds to prevent infinite loops
   MAX_ROUNDS = 3000
+  NUM_PLAYERS_ALLOWED = [2, 4].freeze
 
   attr_reader :players, :deck, :round, :winner
 
@@ -44,9 +45,8 @@ class Game
   private
 
   def choose_players(num)
-    allowed_numbers = [2, 4]
     # If no number is provided, randomly choose between 2 or 4 players
-    num_players = num || allowed_numbers.sample
+    num_players = num || NUM_PLAYERS_ALLOWED.sample
     # If there were a UI component to this, the given number would be validated and an error raised if invalid
     # num_players = allowed_numbers.include?(num) ? num : allowed_numbers.sample
     num_players.times.map { |i| Player.new("Player #{i + 1}", []) }
