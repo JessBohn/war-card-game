@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
 require_relative 'deck'
 require_relative 'player'
 # Game class represents the card game
