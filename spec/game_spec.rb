@@ -33,7 +33,7 @@ RSpec.describe Game do
     end
   end
 
-  context '#choose_players' do
+  context '#set_players' do
     it 'chooses the correct number of players' do
       expect(game.players.size).to eq(num_players)
     end
