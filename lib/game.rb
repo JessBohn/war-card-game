@@ -46,9 +46,8 @@ class Game
 
   def create_players(num)
     # If no number is provided, randomly choose between 2 or 4 players
-    num_players = num || NUM_PLAYERS_ALLOWED.sample
     # If there were a UI component to this, the given number would be validated and an error raised if invalid
-    # num_players = NUM_PLAYERS_ALLOWED.include?(num) ? num : NUM_PLAYERS_ALLOWED.sample
+    num_players = NUM_PLAYERS_ALLOWED.include?(num) ? num : NUM_PLAYERS_ALLOWED.sample
     num_players.times.map { |i| Player.new("Player #{i + 1}", []) }
   end
 
