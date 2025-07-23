@@ -7,10 +7,17 @@ require_relative '../lib/game'
 
 RSpec.describe Game do
   let(:deck) { Deck.new }
+  let(:blank_players_game) { Game.new }
   let(:num_players) { 2 }
   let(:game) { Game.new(num_players) }
 
-  it 'initializes with players and a deck' do
+  it 'initializes with a deck of cards and chooses number of players' do
+    expect(game.deck).to be_a(Deck)
+    expect(game.deck.cards.size).to eq(52)
+    expect(blank_players_game.players.size).to eq(2).or eq(4)
+  end
+
+  it 'initializes with set number of players and a deck' do
     expect(game.players.size).to eq(2)
     expect(game.deck.cards.size).to eq(52)
   end
