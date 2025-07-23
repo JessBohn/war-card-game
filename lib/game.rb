@@ -30,7 +30,6 @@ class Game
     until game_over?
       active_players = players.reject(&:out_of_cards?)
       play_round(active_players)
-      @round += 1
     end
     set_winner
     puts "\nWar is over in #{round - 1} battles! The winner is: #{winner.name}"
@@ -72,6 +71,7 @@ class Game
     else
       winners.first.add_cards(winnings)
     end
+    @round += 1
   end
 
   def game_over?
