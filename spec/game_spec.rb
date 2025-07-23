@@ -106,19 +106,31 @@ RSpec.describe Game do
       end
     end
 
-    context 'when all tied winners have at least 3 cards' do
+    context 'when all tied winners have at least 3 cards and only tie once' do
+      # JUST KIDDING. This leaves room for a tie within a tie since I'm only controlling the first card for each player.
+      # Therefore I have updated the values to those below so that there is only one tie in the round.
       # This is a modified deck to assign half a deck to each player,
       # ensuring the first card for each player ties on an Ace
-      let(:modified_deck) do
-        Deck.new.cards.reject do |card|
-          card.rank == 'A' && %w[Hearts Clubs].include?(card.suit)
-        end
-      end
+      # let(:modified_deck) do
+      #   Deck.new.cards.reject do |card|
+      #     card.rank == 'A' && %w[Hearts Clubs].include?(card.suit)
+      #   end
+      # end
+      # let(:cards1) do
+      #   modified_deck.shift(25).unshift(Card.new('A', 'Hearts'))
+      # end
+      # let(:cards2) do
+      #   modified_deck.shift(25).unshift(Card.new('A', 'Clubs'))
+      # end
       let(:cards1) do
-        modified_deck.shift(25).unshift(Card.new('A', 'Hearts'))
+        [Card.new('A', 'Hearts'), Card.new(3, 'Diamonds'), Card.new(5, 'Hearts'), Card.new(7, 'Diamonds'),
+         Card.new(9, 'Hearts'), Card.new(10, 'Diamonds'), Card.new('K', 'Hearts'), Card.new('Q', 'Diamonds'),
+         Card.new('J', 'Clubs')]
       end
       let(:cards2) do
-        modified_deck.shift(25).unshift(Card.new('A', 'Clubs'))
+        [Card.new('A', 'Clubs'), Card.new(2, 'Spades'), Card.new(4, 'Diamonds'), Card.new(6, 'Hearts'),
+         Card.new(4, 'Clubs'), Card.new(10, 'Spades'), Card.new('K', 'Diamonds'), Card.new('Q', 'Clubs'),
+         Card.new(5, 'Spades')]
       end
 
       it 'handles the tie correctly' do
