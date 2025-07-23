@@ -64,7 +64,11 @@ class Game
       winners.reject!(&:out_of_cards?)
       return if winners.empty?
 
-      war_cards = tie_handler(winners)
+      war_cards = []
+      time = Benchmark.measure do
+        war_cards = tie_handler(winners)
+      end
+      puts "Time taken: #{time.real.round(15)} seconds"
       winnings.concat(war_cards.compact)
 
       play_round(winners, winnings)
@@ -84,14 +88,18 @@ class Game
   def tie_handler(winners)
     war_cards = []
     winners.each do |winner|
-      subset = 3.times.map { winner.draw_card } # Face-down cards
-      # Remove nils in case a player runs out of cards
-      if subset.any?(nil)
-        subset.compact!
-        # Takes the last playable card and puts it back on top of the winner's hand
-        last_playable = subset.pop
-        winner.hand.unshift(last_playable) if last_playable
-      end
+      # subset = 3.times.map { winner.draw_card } # Face-down cards
+      # subset.compact! # Remove nils if there are not enough cards
+      # if subset.size < 3
+      #   # Takes the last playable card and puts it back on top of the winner's hand
+      #   last_playable = subset.pop
+      #   winner.hand.unshift(last_playable) if last_playable
+      # end
+      subset = 4.times.map { winner.draw_card } # Face-down card + face-up war card
+      subset.compact! # Remove nils if there are not enough cards
+
+      last_playable = subset.pop
+      winner.hand.unshift(last_playable) if last_playable
       war_cards.concat(subset)
     end
     war_cards
