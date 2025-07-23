@@ -14,7 +14,7 @@ class Game
   # Leaving the variable num as an argument allows for flexibility in testing and future development
   # If a UI component were to be added, this could be replaced with a user inputted value
   def initialize(num = nil)
-    @players = set_players(num)
+    @players = create_players(num)
     @deck = Deck.new
     @round = 1
     @winner = nil
@@ -45,7 +45,7 @@ class Game
 
   private
 
-  def set_players(num)
+  def create_players(num)
     # If no number is provided, randomly choose between 2 or 4 players
     num_players = num || NUM_PLAYERS_ALLOWED.sample
     # If there were a UI component to this, the given number would be validated and an error raised if invalid
