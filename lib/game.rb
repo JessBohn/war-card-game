@@ -27,7 +27,7 @@ class Game
     deal_cards
 
     puts 'Starting the war...'
-    until game_over? || round > MAX_ROUNDS
+    until game_over?
       active_players = players.reject(&:out_of_cards?)
       play_round(active_players)
       @round += 1
@@ -75,7 +75,7 @@ class Game
   end
 
   def game_over?
-    players.count { |player| !player.out_of_cards? } <= 1
+    players.count { |player| !player.out_of_cards? } <= 1 || round > MAX_ROUNDS
   end
 
   def set_winner
