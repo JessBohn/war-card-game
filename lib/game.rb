@@ -64,11 +64,7 @@ class Game
       winners.reject!(&:out_of_cards?)
       return if winners.empty?
 
-      war_cards = []
-      time = Benchmark.measure do
-        war_cards = tie_handler(winners)
-      end
-      puts "Time taken: #{time.real.round(15)} seconds"
+      war_cards = tie_handler(winners)
       winnings.concat(war_cards.compact)
 
       play_round(winners, winnings)
@@ -95,11 +91,14 @@ class Game
       #   last_playable = subset.pop
       #   winner.hand.unshift(last_playable) if last_playable
       # end
+      # The below method involves no looping
       subset = 4.times.map { winner.draw_card } # Face-down card + face-up war card
       subset.compact! # Remove nils if there are not enough cards
 
-      last_playable = subset.pop
-      winner.hand.unshift(last_playable) if last_playable
+      # last_playable = subset.pop
+      # winner.hand.unshift(last_playable) if last_playable
+      winner.hand.unshift(subset.pop)
+      # It doesn't matter if the value is nil since compact will be called on the array
       war_cards.concat(subset)
     end
     war_cards
