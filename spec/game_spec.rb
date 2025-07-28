@@ -10,9 +10,23 @@ RSpec.describe Game do
   let(:num_players) { 2 }
   let(:game) { Game.new(num_players) }
 
-  it 'initializes with players and a deck' do
-    expect(game.players.size).to eq(2)
-    expect(game.deck.cards.size).to eq(52)
+  context 'initialization without giving the number of players' do
+    let(:game) { Game.new }
+    it 'initializes with a deck of cards, sets number of players, starts at round 1, and has no winner' do
+      expect(game.deck).to be_a(Deck)
+      expect(game.players.size).to eq(2).or eq(4)
+      expect(game.round).to eq(1)
+      expect(game.winner).to be_nil
+    end
+  end
+
+  context 'initialization with a specific number of players' do
+    it 'initializes with given number of players and a deck' do
+      expect(game.players.size).to eq(2)
+      expect(game.deck.cards.size).to eq(52)
+      expect(game.round).to eq(1)
+      expect(game.winner).to be_nil
+    end
   end
 
   it 'starts with each player having an empty hand' do
@@ -24,9 +38,14 @@ RSpec.describe Game do
       game = Game.new(2)
       expect { game.play }.to change { game.winner }.from(nil)
     end
+
+    it 'still has same number of players after play' do
+      game.play
+      expect(game.players.size).to eq(num_players)
+    end
   end
 
-  context '#choose_players' do
+  context '#create_players' do
     it 'chooses the correct number of players' do
       expect(game.players.size).to eq(num_players)
     end
@@ -106,19 +125,31 @@ RSpec.describe Game do
       end
     end
 
-    context 'when all tied winners have at least 3 cards' do
+    context 'when all tied winners have at least 3 cards and only tie once' do
+      # JUST KIDDING. This leaves room for a tie within a tie since I'm only controlling the first card for each player.
+      # Therefore I have updated the values to those below so that there is only one tie in the round.
       # This is a modified deck to assign half a deck to each player,
       # ensuring the first card for each player ties on an Ace
-      let(:modified_deck) do
-        Deck.new.cards.reject do |card|
-          card.rank == 'A' && %w[Hearts Clubs].include?(card.suit)
-        end
-      end
+      # let(:modified_deck) do
+      #   Deck.new.cards.reject do |card|
+      #     card.rank == 'A' && %w[Hearts Clubs].include?(card.suit)
+      #   end
+      # end
+      # let(:cards1) do
+      #   modified_deck.shift(25).unshift(Card.new('A', 'Hearts'))
+      # end
+      # let(:cards2) do
+      #   modified_deck.shift(25).unshift(Card.new('A', 'Clubs'))
+      # end
       let(:cards1) do
-        modified_deck.shift(25).unshift(Card.new('A', 'Hearts'))
+        [Card.new('A', 'Hearts'), Card.new(3, 'Diamonds'), Card.new(5, 'Hearts'), Card.new(7, 'Diamonds'),
+         Card.new(9, 'Hearts'), Card.new(10, 'Diamonds'), Card.new('K', 'Hearts'), Card.new('Q', 'Diamonds'),
+         Card.new('J', 'Clubs')]
       end
       let(:cards2) do
-        modified_deck.shift(25).unshift(Card.new('A', 'Clubs'))
+        [Card.new('A', 'Clubs'), Card.new(2, 'Spades'), Card.new(4, 'Diamonds'), Card.new(6, 'Hearts'),
+         Card.new(4, 'Clubs'), Card.new(10, 'Spades'), Card.new('K', 'Diamonds'), Card.new('Q', 'Clubs'),
+         Card.new(5, 'Spades')]
       end
 
       it 'handles the tie correctly' do
