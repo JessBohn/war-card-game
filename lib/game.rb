@@ -27,10 +27,7 @@ class Game
     deal_cards
 
     puts 'Starting the war...'
-    until game_over?
-      active_players = players.reject(&:out_of_cards?)
-      play_round(active_players)
-    end
+    play_round(active_players) until game_over?
     winner = self.winner
     puts "\nWar is over in #{round - 1} battles! The winner is: #{winner.name}"
   end
@@ -49,24 +46,19 @@ class Game
   private
 
   def create_players(num)
-    # If no number is provided, randomly choose between 2 or 4 players
-    # If there were a UI component to this, the given number would be validated and an error raised if invalid
     num_players = NUM_PLAYERS_ALLOWED.include?(num) ? num : NUM_PLAYERS_ALLOWED.sample
     num_players.times.map { |i| Player.new("Player #{i + 1}", []) }
   end
 
-  def play_round(active_players, winnings = [])
-    plays = active_players.map { |p| [p, p.draw_card] }.to_h
+  def play_round(player_set, winnings = [])
+    plays = player_set.map { |p| [p, p.draw_card] }.to_h
 
     max_card = plays.values.compact.max
     winners = plays.select { |_, card| card == max_card }.keys
     winnings.concat(plays.values)
 
     if winners.size > 1
-      # If a player tied on their last card, they're automatically out of the game
-      winners.reject!(&:out_of_cards?)
-      return if winners.empty?
-
+      winners = active_players(winners)
       war_cards = tie_handler(winners)
       winnings.concat(war_cards.compact)
 
@@ -77,8 +69,12 @@ class Game
     round + 1
   end
 
+  def active_players(player_set = players)
+    player_set.reject(&:out_of_cards?)
+  end
+
   def game_over?
-    players.count { |player| !player.out_of_cards? } == 1 || round > MAX_ROUNDS
+    active_players.size == 1 || round > MAX_ROUNDS
   end
 
   def tie_handler(winners)

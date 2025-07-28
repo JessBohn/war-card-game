@@ -38,6 +38,11 @@ RSpec.describe Game do
       game = Game.new(2)
       expect { game.play }.to change { game.winner }.from(nil)
     end
+
+    it 'still has same number of players after play' do
+      game.play
+      expect(game.players.size).to eq(num_players)
+    end
   end
 
   context '#create_players' do
