@@ -8,7 +8,8 @@ class Game
   MAX_ROUNDS = 5000
   NUM_PLAYERS_ALLOWED = [2, 4].freeze
 
-  attr_reader :players, :deck, :round, :winner
+  attr_reader :players, :deck
+  attr_accessor :round
 
   # Initializes the game with a number of players
   # Leaving the variable num as an argument allows for flexibility in testing and future development
@@ -17,7 +18,6 @@ class Game
     @players = create_players(num)
     @deck = Deck.new
     @round = 1
-    @winner = nil
   end
 
   def play
@@ -31,7 +31,7 @@ class Game
       active_players = players.reject(&:out_of_cards?)
       play_round(active_players)
     end
-    set_winner
+    winner = self.winner
     puts "\nWar is over in #{round - 1} battles! The winner is: #{winner.name}"
   end
 
@@ -40,6 +40,10 @@ class Game
     players.each_with_index do |player, index|
       player.hand = dealt_cards[index]
     end
+  end
+
+  def winner
+    game_over? ? players.max_by { |player| player.hand.size } : nil
   end
 
   private
@@ -70,15 +74,11 @@ class Game
     else
       winners.first.add_cards(winnings)
     end
-    @round += 1
+    round + 1
   end
 
   def game_over?
-    players.count { |player| !player.out_of_cards? } <= 1 || round > MAX_ROUNDS
-  end
-
-  def set_winner
-    @winner = @players.max_by { |player| player.hand.size }
+    players.count { |player| !player.out_of_cards? } == 1 || round > MAX_ROUNDS
   end
 
   def tie_handler(winners)
