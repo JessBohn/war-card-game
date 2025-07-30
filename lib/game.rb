@@ -28,8 +28,7 @@ class Game
 
     puts 'Starting the war...'
     play_round(active_players) until game_over?
-    winner = self.winner
-    puts "\nWar is over in #{round - 1} battles! The winner is: #{winner.name}"
+    winner_statement
   end
 
   def deal_cards
@@ -40,7 +39,7 @@ class Game
   end
 
   def winner
-    game_over? ? players.max_by { |player| player.hand.size } : nil
+    game_over? ? active_players : nil
   end
 
   private
@@ -98,5 +97,13 @@ class Game
       war_cards.concat(subset)
     end
     war_cards
+  end
+
+  def winner_statement
+    if game_over? && winner.size == 1
+      puts "#{winner.first.name} wins the game!"
+    else
+      puts "The game ended in a draw at #{MAX_ROUNDS} rounds!"
+    end
   end
 end
